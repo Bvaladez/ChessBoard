@@ -15,7 +15,7 @@ using namespace std;
 
 
 // Global Variables
-// Some colors you can use, or make your own and add them
+//Colors
 // here and in graphics.h
 GLdouble redMaterial[] = {0.7, 0.1, 0.2, 1.0};
 GLdouble greenMaterial[] = {0.1, 0.7, 0.4, 1.0};
@@ -82,23 +82,6 @@ void FindTriangleNormal(double x[], double y[], double z[], double n[])
 // Loads the given data file and draws it at its default position.
 // Call glTranslate before calling this to get it in the right place.
 
-void DrawQuad(double x1, double y1, double z1, double x2, double y2, double z2, double x3, double y3, double z3, double x4, double y4, double z4)
-{
-	glBegin(GL_QUADS);
-	glVertex3d(x1, y1, z1);
-	glVertex3d(x2, y2, z2);
-
-	glVertex3d(x2, y2, z2);
-	glVertex3d(x3, y3, z3);
-
-	glVertex3d(x3, y3, z3);
-	glVertex3d(x4, y4, z4);
-
-	glVertex3d(x4, y4, z4);
-	glVertex3d(x1, y1, z1);
-
-	glEnd();
-}
 
 
 void DrawPiece(const char filename[])
@@ -156,9 +139,30 @@ void DrawPiece(const char filename[])
 
 }
 
+
+void DrawQuad(double x1, double y1, double z1, double x2, double y2, double z2, double x3, double y3, double z3, double x4, double y4, double z4)
+{
+	glBegin(GL_QUADS);
+	glVertex3d(x1, y1, z1);
+	glVertex3d(x2, y2, z2);
+
+	glVertex3d(x2, y2, z2);
+	glVertex3d(x3, y3, z3);
+
+	glVertex3d(x3, y3, z3);
+	glVertex3d(x4, y4, z4);
+
+	glVertex3d(x4, y4, z4);
+	glVertex3d(x1, y1, z1);
+
+	glEnd();
+}
+
 // NOTE: Y is the UP direction for the chess pieces.
-double eye[3] = {4500, 8000, -4000}; // pick a nice vantage point.
-double at[3]  = {4500, 0,     4000};
+double eye[3] = {4500, 9000, -5000}; // pick a nice vantage point.
+//double eye[3] = {4500, 8000, -4000}; // pick a nice vantage point.
+double at[3]  = {4500, 0, 4000};
+//double at[3]  = {4500, 0,     4000};
 //
 // GLUT callback functions
 //
@@ -185,69 +189,100 @@ void display(void)
 
 	glLoadIdentity();
 	gluLookAt(eye[0], eye[1], eye[2],  at[0], at[1], at[2],  0,1,0); // Y is up!
+	//gluLookAt(eye[0], eye[1], eye[2],  at[0], at[1], at[2],  0,1,0); // Y is up!
+	
 	// Set the color for one side (white), and draw its 16 pieces.
-	GLfloat mat_amb_diff1[] = {0.8f, 0.9f, 0.5f, 1.0f};
+	GLfloat mat_amb_diff1[] = {1.0f, 1.0f, 1.0f,1.0f};
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff1);
 
-	glPushMatrix();
-	glTranslatef(3000, 0, 1000);
-	DrawPiece("BISHOP.POL");
-	glPopMatrix();
+	int characterSizebuffer = 500;
 
-	glPushMatrix();
-	glTranslatef(4000, 0, 1000);
-	DrawPiece("KING.POL");
-	glPopMatrix();
-
-	double z;
-	Interpolate(t, 1.0, 3.0, z, 1000, 5000);
-	glPushMatrix();
-	glTranslatef(5000, 0, z);
-	DrawPiece("QUEEN.POL");
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(6000, 0, 1000);
-	DrawPiece("BISHOP.POL");
-	glPopMatrix();
-
-	// Set the color for one side (black), and draw its 16 pieces.
-	GLfloat mat_amb_diff2[] = {0.1f, 0.5f, 0.8f, 1.0};
-	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-
-	double x;
-	Interpolate(t, 4.0, 6.0, x, 4000, 2000);
-	glPushMatrix();
-	glTranslatef(x, 0, 8000);
-	DrawPiece("KING.POL");
-	glPopMatrix();
-
-	for(int x=1000; x<=8000; x+=1000)
+	for(int x=0 + characterSizebuffer; x<= 8000 + characterSizebuffer; x+=1000)
 	{
 		glPushMatrix();
-		glTranslatef(x, 0, 7000);
+		glTranslatef(x, 0, 1000 + characterSizebuffer);
+		DrawPiece("PAWN.POL");
+		glPopMatrix();
+	}
+
+	glPushMatrix();
+	glTranslatef(3000 + characterSizebuffer, 0, 0 + characterSizebuffer);
+	DrawPiece("BISHOP.POL");
+	glPopMatrix();
+
+	//glPushMatrix();
+	//glTranslatef(4000, 0, 1000);	for(int x=1000; x<=8000; x+=1000)
+	//{
+	//	glPushMatrix();
+	//	glTranslatef(x, 0, 7000);
+	//	DrawPiece("PAWN.POL");
+	//	glPopMatrix();
+	//}
+
+	//DrawPiece("KING.POL");
+	//glPopMatrix();
+
+	//double z;
+	//Interpolate(t, 1.0, 3.0, z, 1000, 5000);
+	//glPushMatrix();
+	//glTranslatef(5000, 0, z);
+	//DrawPiece("QUEEN.POL");
+	//glPopMatrix();
+
+	//glPushMatrix();
+	//glTranslatef(6000, 0, 1000);
+	//DrawPiece("BISHOP.POL");
+	//glPopMatrix();
+
+
+
+	// Set the color for one side (black), and draw its 16 pieces.
+	GLfloat mat_amb_diff2[] = {0.1f, 0.1f, 0.1f, 1.0};
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+	
+	//double x;
+	//Interpolate(t, 4.0, 6.0, x, 4000, 2000);
+	//glPushMatrix();
+	//glTranslatef(x, 0, 8000);
+	//DrawPiece("KING.POL");
+	//glPopMatrix();
+
+	//shift for size of piece as to not sure where they are measured from
+	for(int x=500; x<=8500; x+=1000)
+	{
+		glPushMatrix();
+		glTranslatef(x, 0, 7000 + characterSizebuffer );
 		DrawPiece("PAWN.POL");
 		glPopMatrix();
 	}
 	
-	//Setup Material/Coloring for floor
+	//Draw the board
 	int buffer = 1000;
-	for (int i = 0; i < 100; i++) {
-		for (int j = 0; j < 100; j++) {
-			if (j % 2 == 0 || i % 2 == 0) {
-				GLfloat mat_amb_diff3[] = {0.8f, 0.5f, 0.8f, 1.0};
-				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff3);
+	
+	for (int x = 0; x <= 8000; x += buffer) {
+		for (int z = 0; z <= 8000; z += buffer) {
+
+			//Color RED squares
+			if (x % 2000 == 0 && z % 2000 != 0) {
+				GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
+				}
+			else if (x % 2000 != 0 && z % 2000 == 0) {
+				GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
 			}
+			//color BLUE squares
 			else {
-				GLfloat mat_amb_diff3[] = {0.8f, 0.1f, 0.1f, 1.0};
-				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff3);
+				GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 1.0f, 1.0};
+				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
+		
 			}
-			//scale for board
-			int x = i * 100;
-			int y = j * 100;
-			DrawQuad(x, 0, y, x + buffer, 0, y, x + buffer, 0, y + buffer, x, 0, y + buffer);
 		}
 	}
+
 
 	//int buffer = 1000;
 	//int i = 1000;
