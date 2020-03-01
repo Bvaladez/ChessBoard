@@ -158,6 +158,15 @@ void DrawQuad(double x1, double y1, double z1, double x2, double y2, double z2, 
 	glEnd();
 }
 
+void DrawLine(double x1, double y1, double x2, double y2)
+{
+	glBegin(GL_LINES);
+	glVertex2d(x1, y1);
+	glVertex2d(x2, y2);
+	glEnd();
+}
+
+
 // NOTE: Y is the UP direction for the chess pieces.
 double eye[3] = {4500, 9000, -5000}; // pick a nice vantage point.
 //double eye[3] = {4500, 8000, -4000}; // pick a nice vantage point.
@@ -275,10 +284,39 @@ void display(void)
 			}
 			//color BLUE squares
 			else {
-				GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 1.0f, 1.0};
+				GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
 				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
 				DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
 		
+			}
+		}
+	}
+
+	for (int x = 0; x <= 8000; x += buffer) {
+		for (int z = 0; z <= 8000; z += buffer) {
+			if (z == 0) {
+				//Color RED squares
+				if (x % 2000 == 0 && z % 2000 != 0) {
+					GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+					glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+					DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
+					}
+				else if (x % 2000 != 0 && z % 2000 == 0) {
+					GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+					glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+					DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
+				}
+				//color BLUE squares
+				else {
+					GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
+					glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+					DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
+			
+				}
+			
+				GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
+				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				DrawLine(x, z, x + buffer, z);
 			}
 		}
 	}
