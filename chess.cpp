@@ -158,6 +158,24 @@ void DrawQuad(double x1, double y1, double z1, double x2, double y2, double z2, 
 	glEnd();
 }
 
+void DrawQuadOutline(double x1, double y1, double z1, double x2, double y2, double z2, double x3, double y3, double z3, double x4, double y4, double z4)
+{
+	glBegin(GL_LINES);
+	glVertex3d(x1, y1, z1);
+	glVertex3d(x2, y2, z2);
+
+	glVertex3d(x2, y2, z2);
+	glVertex3d(x3, y3, z3);
+
+	glVertex3d(x3, y3, z3);
+	glVertex3d(x4, y4, z4);
+
+	glVertex3d(x4, y4, z4);
+	glVertex3d(x1, y1, z1);
+
+	glEnd();
+}
+
 void DrawLine(double x1, double y1, double x2, double y2)
 {
 	glBegin(GL_LINES);
@@ -167,11 +185,17 @@ void DrawLine(double x1, double y1, double x2, double y2)
 }
 
 
-// NOTE: Y is the UP direction for the chess pieces.
-double eye[3] = {4500, 9000, -5000}; // pick a nice vantage point.
-//double eye[3] = {4500, 8000, -4000}; // pick a nice vantage point.
-double at[3]  = {4500, 0, 4000};
-//double at[3]  = {4500, 0,     4000};
+enum View {bottom, top, left, right,};
+View current_view = bottom;
+
+//Side View
+double eyel[3] = {14000, 9000, 4000};
+double atl[3]  = {4000, 0, 4000};
+//Back View
+double eye[3] = {4000, 9000, -5000};
+double at[3]  = {4000, 0, 4000};
+
+
 //
 // GLUT callback functions
 //
@@ -197,16 +221,28 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glLoadIdentity();
+	if (current_view == bottom) {
 	gluLookAt(eye[0], eye[1], eye[2],  at[0], at[1], at[2],  0,1,0); // Y is up!
+	}
+	else if (current_view == ::left){
+		gluLookAt(eyel[0], eyel[1], eyel[2],  atl[0], atl[1], atl[2],  0,1,0); // Y is up!
+	}
 	//gluLookAt(eye[0], eye[1], eye[2],  at[0], at[1], at[2],  0,1,0); // Y is up!
-	
+
+
+	/************************************************************************************************************************************
+
+				WHITE'S BOARDS SPACE
+
+	*************************************************************************************************************************************/
+
 	// Set the color for one side (white), and draw its 16 pieces.
 	GLfloat mat_amb_diff1[] = {1.0f, 1.0f, 1.0f,1.0f};
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff1);
 
 	int characterSizebuffer = 500;
 
-	for(int x=0 + characterSizebuffer; x<= 8000 + characterSizebuffer; x+=1000)
+	for(int x = 0 + characterSizebuffer; x < 8000 + characterSizebuffer; x += 1000)
 	{
 		glPushMatrix();
 		glTranslatef(x, 0, 1000 + characterSizebuffer);
@@ -215,7 +251,48 @@ void display(void)
 	}
 
 	glPushMatrix();
+	glTranslatef(4000 + characterSizebuffer, 0, 0 + characterSizebuffer);
+	DrawPiece("QUEEN.POL");
+	glPopMatrix();
+
+	glPushMatrix();
 	glTranslatef(3000 + characterSizebuffer, 0, 0 + characterSizebuffer);
+	DrawPiece("KING.POL");
+	glPopMatrix();
+
+
+
+	glPushMatrix();
+	glTranslatef(7000 + characterSizebuffer, 0, 0 + characterSizebuffer);
+	DrawPiece("ROOK.POL");
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0000 + characterSizebuffer, 0, 0 + characterSizebuffer);
+	DrawPiece("ROOK.POL");
+	glPopMatrix();
+
+
+
+	glPushMatrix();
+	glTranslatef(6000 + characterSizebuffer, 0, 0 + characterSizebuffer);
+	DrawPiece("KNIGHT.POL");
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(1000 + characterSizebuffer, 0, 0 + characterSizebuffer);
+	DrawPiece("KNIGHT.POL");
+	glPopMatrix();
+
+		
+
+	glPushMatrix();
+	glTranslatef(5000 + characterSizebuffer, 0, 0 + characterSizebuffer);
+	DrawPiece("BISHOP.POL");
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(2000 + characterSizebuffer, 0, 0 + characterSizebuffer);
 	DrawPiece("BISHOP.POL");
 	glPopMatrix();
 
@@ -243,7 +320,11 @@ void display(void)
 	//DrawPiece("BISHOP.POL");
 	//glPopMatrix();
 
+	/************************************************************************************************************************************
 
+				BLACK'S BOARDS SPACE
+
+	*************************************************************************************************************************************/
 
 	// Set the color for one side (black), and draw its 16 pieces.
 	GLfloat mat_amb_diff2[] = {0.1f, 0.1f, 0.1f, 1.0};
@@ -257,45 +338,108 @@ void display(void)
 	//glPopMatrix();
 
 	//shift for size of piece as to not sure where they are measured from
-	for(int x=500; x<=8500; x+=1000)
+	for(int x= 0 + characterSizebuffer; x<8000 + characterSizebuffer; x+=1000)
 	{
 		glPushMatrix();
-		glTranslatef(x, 0, 7000 + characterSizebuffer );
+		glTranslatef(x, 0, 6000 + characterSizebuffer );
 		DrawPiece("PAWN.POL");
 		glPopMatrix();
 	}
-	
+
+	glPushMatrix();
+	glTranslatef(4000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
+	DrawPiece("QUEEN.POL");
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(3000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
+	DrawPiece("KING.POL");
+	glPopMatrix();
+
+
+
+	glPushMatrix();
+	glTranslatef(7000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
+	DrawPiece("ROOK.POL");
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
+	DrawPiece("ROOK.POL");
+	glPopMatrix();
+
+
+
+	glPushMatrix();
+	glTranslatef(6000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
+	glRotated(180, 0, 1, 0);
+	DrawPiece("KNIGHT.POL");
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(1000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
+	glRotated(180, 0, 1, 0);
+	DrawPiece("KNIGHT.POL");
+	glPopMatrix();
+
+		
+
+	glPushMatrix();
+	glTranslatef(5000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
+	DrawPiece("BISHOP.POL");
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(2000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
+	DrawPiece("BISHOP.POL");
+	glPopMatrix();
+
+
+
+	/************************************************************************************************************************************
+
+				 BOARD SPACE
+
+	*************************************************************************************************************************************/
+
 	//Draw the board
 	int buffer = 1000;
 	
-	for (int x = 0; x <= 8000; x += buffer) {
-		for (int z = 0; z <= 8000; z += buffer) {
-
-			//Color RED squares
-			if (x % 2000 == 0 && z % 2000 != 0) {
-				GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
+	for (int x = 0; x < 8000; x += buffer) {
+		for (int z = 0; z < 8000; z += buffer) {
+			
+			// DRAW FAR SIDE LIP X = 8000
+			if (x == 7000) {
+				
+				//DRAW RED LIP
+				if (x % 2000 == 0 && z % 2000 != 0) {
+					GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+					glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+					DrawQuad(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
+					}
+				else if (x % 2000 != 0 && z % 2000 == 0) {
+					GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+					glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+					DrawQuad(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
 				}
-			else if (x % 2000 != 0 && z % 2000 == 0) {
-				GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+				//DRAW GRAY LIP
+				else {
+					GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
+					glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+					DrawQuad(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
+			
+				}
+			
+				GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
 				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
+				DrawQuadOutline(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
+				//DrawQuadOutline(x, z, x + buffer, z);
 			}
-			//color BLUE squares
-			else {
-				GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
-				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
-		
-			}
-		}
-	}
 
-	for (int x = 0; x <= 8000; x += buffer) {
-		for (int z = 0; z <= 8000; z += buffer) {
+			
 			if (z == 0) {
-				//Color RED squares
+				
+				//DRAW RED LIP
 				if (x % 2000 == 0 && z % 2000 != 0) {
 					GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
 					glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
@@ -306,7 +450,7 @@ void display(void)
 					glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
 					DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
 				}
-				//color BLUE squares
+				//DRAW GRAY LIP
 				else {
 					GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
 					glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
@@ -316,19 +460,68 @@ void display(void)
 			
 				GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
 				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				DrawLine(x, z, x + buffer, z);
+				DrawQuadOutline(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
+				//DrawQuadOutline(x, z, x + buffer, z);
 			}
+
+			// DRAW RED SQUARES
+			if (x % 2000 == 0 && z % 2000 != 0) {
+				GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
+				}
+			else if (x % 2000 != 0 && z % 2000 == 0) {
+				GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
+			}
+			// DRAW GRAY SQUARES
+			else {
+				GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
+				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
+		
+			}
+			
+			GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
+			glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+			
+			DrawQuadOutline(x, 0.1, z, x, 0.1, z + buffer, x + buffer, 0.1, z + buffer, x + buffer, 0.1, z);
 		}
 	}
 
+	// Draw board lip WHITE'S side
+	//for (int x = 0; x < 8000; x += buffer) {
+	//	for (int z = 0; z < 8000; z += buffer) {
+	//		if (z == 0) {
+	//			
+	//			//DRAW RED squares
+	//			if (x % 2000 == 0 && z % 2000 != 0) {
+	//				GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+	//				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+	//				DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
+	//				}
+	//			else if (x % 2000 != 0 && z % 2000 == 0) {
+	//				GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+	//				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+	//				DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
+	//			}
+	//			//DRAW BLUE squares
+	//			else {
+	//				GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
+	//				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+	//				DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
+	//		
+	//			}
+	//		
+	//			GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
+	//			glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+	//			DrawLine(x, z, x + buffer, z);
+	//		}
+	//	}
+	//}
 
-	//int buffer = 1000;
-	//int i = 1000;
-	//int j = 1000;
-	//draw top of board squares	
-	//DrawQuad(i, 0, j, i + buffer, 0, j, i + buffer, 0, j + buffer, i, 0, j + buffer);
-	//draw side lip
-	//DrawQuad(i, j, 0,  i + buffer,  j, 0, i + buffer, j + buffer, 0, i, j + buffer, 0);
+
 	GLfloat light_position[] = {1,2,-.1f, 0}; // light comes FROM this vector direction.
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position); // position first light
 
@@ -346,6 +539,15 @@ void keyboard(unsigned char c, int x, int y)
 		case 27: // escape character means to quit the program
 			exit(0);
 			break;
+
+		case 'b':
+			current_view = ::bottom;
+			break;
+		
+		case 'l':
+			current_view = ::left;
+			break;
+
 		default:
 			return; // if we don't care, return without glutPostRedisplay()
 	}
