@@ -12,6 +12,7 @@
 using namespace std;
 #include "glut.h"
 #include "graphics.h"
+#include "chess_board.h"
 
 
 // Global Variables
@@ -31,7 +32,7 @@ double GetTime()
 {
 	static clock_t start_time = clock();
 	clock_t current_time = clock();
-	double total_time = double(current_time - start_time) / CLOCKS_PER_SEC;
+	double total_time = double( current_time - start_time ) / CLOCKS_PER_SEC;
 	return total_time;
 }
 
@@ -187,8 +188,10 @@ void DrawLine(double x1, double y1, double x2, double y2)
 
 enum View {bottom, top, left, right,};
 View current_view = bottom;
-
-//Side View
+//side View Right
+double eyer[3] = {-6000, 9000, 4000};
+double atr[3]  = {4000, 0, 4000};
+//Side View Left
 double eyel[3] = {14000, 9000, 4000};
 double atl[3]  = {4000, 0, 4000};
 //Back View
@@ -226,6 +229,9 @@ void display(void)
 	}
 	else if (current_view == ::left){
 		gluLookAt(eyel[0], eyel[1], eyel[2],  atl[0], atl[1], atl[2],  0,1,0); // Y is up!
+	}
+	else if (current_view == ::right) {
+		gluLookAt(eyer[0], eyer[1], eyer[2],  atr[0], atr[1], atr[2],  0,1,0); // Y is up!
 	}
 	//gluLookAt(eye[0], eye[1], eye[2],  at[0], at[1], at[2],  0,1,0); // Y is up!
 
@@ -408,119 +414,117 @@ void display(void)
 	for (int x = 0; x < 8000; x += buffer) {
 		for (int z = 0; z < 8000; z += buffer) {
 			
-			// DRAW FAR SIDE LIP X = 8000
-			if (x == 7000) {
-				
-				//DRAW RED LIP
-				if (x % 2000 == 0 && z % 2000 != 0) {
-					GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-					glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-					DrawQuad(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
-					}
-				else if (x % 2000 != 0 && z % 2000 == 0) {
-					GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-					glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-					DrawQuad(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
-				}
-				//DRAW GRAY LIP
-				else {
-					GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
-					glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-					DrawQuad(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
+			//DRAW CLOSE SIDE LIP x = 0
+			if (x == 0 && current_view == ::right) {
+				DrawXZeroLip(x, z);
+				////DRAW RED LIP
+				//if (x % 2000 == 0 && z % 2000 != 0) {
+				//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				//	DrawQuad(x, 0, z, x, 0, z + buffer, x, (-1 * buffer), z + buffer, x, (-1 * buffer), z);
+				//	}
+				//else if (x % 2000 != 0 && z % 2000 == 0) {
+				//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				//	DrawQuad(x, 0, z, x, 0, z + buffer, x, (-1 * buffer), z + buffer, x, (-1 * buffer), z);
+				//}
+				////DRAW GRAY LIP
+				//else {
+				//	GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
+				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				//	DrawQuad(x, 0, z, x, 0, z + buffer, x, (-1 * buffer), z + buffer, x, (-1 * buffer), z);
 			
-				}
+				//}
 			
-				GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
-				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				DrawQuadOutline(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
-				//DrawQuadOutline(x, z, x + buffer, z);
-			}
+				//GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
+				//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				//DrawQuadOutline(x, 0, z, x, 0, z + buffer, x, (-1 * buffer), z + buffer, x, (-1 * buffer), z);
+				////DrawQuadOutline(x, z, x + buffer, z);
 
-			
-			if (z == 0) {
-				
-				//DRAW RED LIP
-				if (x % 2000 == 0 && z % 2000 != 0) {
-					GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-					glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-					DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
-					}
-				else if (x % 2000 != 0 && z % 2000 == 0) {
-					GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-					glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-					DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
-				}
-				//DRAW GRAY LIP
-				else {
-					GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
-					glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-					DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
-			
-				}
-			
-				GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
-				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				DrawQuadOutline(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
-				//DrawQuadOutline(x, z, x + buffer, z);
 			}
-
-			// DRAW RED SQUARES
-			if (x % 2000 == 0 && z % 2000 != 0) {
-				GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
-				}
-			else if (x % 2000 != 0 && z % 2000 == 0) {
-				GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
-			}
-			// DRAW GRAY SQUARES
-			else {
-				GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
-				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
 		
+			// DRAW FAR SIDE LIP X = 8000
+			if (x == 7000 && current_view == ::left) {
+				DrawXMaxLip(x, z);
+				////DRAW RED LIP
+				//if (x % 2000 == 0 && z % 2000 != 0) {
+				//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				//	DrawQuad(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
+				//	}
+				//else if (x % 2000 != 0 && z % 2000 == 0) {
+				//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				//	DrawQuad(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
+				//}
+				////DRAW GRAY LIP
+				//else {
+				//	GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
+				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				//	DrawQuad(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
+			
+				//}
+			
+				//GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
+				//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				//DrawQuadOutline(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
+				////DrawQuadOutline(x, z, x + buffer, z);
+			}
+
+			//DRAW BOTTOM LIP	
+			if (z == 0 && current_view == ::bottom) {
+				DrawZZeroLip(x, z);
+				////DRAW RED LIP
+				//if (x % 2000 == 0 && z % 2000 != 0) {
+				//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				//	DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
+				//	}
+				//else if (x % 2000 != 0 && z % 2000 == 0) {
+				//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				//	DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
+				//}
+				////DRAW GRAY LIP
+				//else {
+				//	GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
+				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				//	DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
+			
+				//}
+			
+				//GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
+				//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+				//DrawQuadOutline(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
+				////DrawQuadOutline(x, z, x + buffer, z);
 			}
 			
-			GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
-			glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-			
-			DrawQuadOutline(x, 0.1, z, x, 0.1, z + buffer, x + buffer, 0.1, z + buffer, x + buffer, 0.1, z);
+			DrawMainBoard(x, z);
+			//// DRAW RED SQUARES
+			//if (x % 2000 == 0 && z % 2000 != 0) {
+			//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+			//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+			//	DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
+			//	}
+			//else if (x % 2000 != 0 && z % 2000 == 0) {
+			//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
+			//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+			//	DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
+			//}
+			//// DRAW GRAY SQUARES
+			//else {
+			//	GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
+			//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+			//	DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
+		
+			//}
+			//
+			//GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
+			//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
+			//
+			//DrawQuadOutline(x, 0.1, z, x, 0.1, z + buffer, x + buffer, 0.1, z + buffer, x + buffer, 0.1, z);
 		}
 	}
-
-	// Draw board lip WHITE'S side
-	//for (int x = 0; x < 8000; x += buffer) {
-	//	for (int z = 0; z < 8000; z += buffer) {
-	//		if (z == 0) {
-	//			
-	//			//DRAW RED squares
-	//			if (x % 2000 == 0 && z % 2000 != 0) {
-	//				GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-	//				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-	//				DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
-	//				}
-	//			else if (x % 2000 != 0 && z % 2000 == 0) {
-	//				GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-	//				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-	//				DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
-	//			}
-	//			//DRAW BLUE squares
-	//			else {
-	//				GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
-	//				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-	//				DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
-	//		
-	//			}
-	//		
-	//			GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
-	//			glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-	//			DrawLine(x, z, x + buffer, z);
-	//		}
-	//	}
-	//}
-
 
 	GLfloat light_position[] = {1,2,-.1f, 0}; // light comes FROM this vector direction.
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position); // position first light
@@ -548,6 +552,9 @@ void keyboard(unsigned char c, int x, int y)
 			current_view = ::left;
 			break;
 
+		case 'r':
+			current_view = ::right;
+			break;
 		default:
 			return; // if we don't care, return without glutPostRedisplay()
 	}
