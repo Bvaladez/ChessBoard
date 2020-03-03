@@ -250,6 +250,38 @@ void display(void)
 
 	*************************************************************************************************************************************/
 
+	enum piece_numbers { pawn = 100, king, queen, rook, bishop, knight };
+
+	glNewList(pawn, GL_COMPILE);
+	DrawPiece("PAWN.POL");
+	glEndList();
+
+	glNewList(king, GL_COMPILE);
+	DrawPiece("KING.POL");
+	glEndList();
+
+	glNewList(queen, GL_COMPILE);
+	DrawPiece("QUEEN.POL");
+	glEndList();
+
+
+	glNewList(rook, GL_COMPILE);
+	DrawPiece("ROOK.POL");
+	glEndList();
+
+
+	glNewList(bishop, GL_COMPILE);
+	DrawPiece("BISHOP.POL");
+	glEndList();
+
+	glNewList(knight, GL_COMPILE);
+	DrawPiece("KNIGHT.POL");
+	glEndList();
+
+
+
+
+
 	// Set the color for one side (white), and draw its 16 pieces.
 	GLfloat mat_amb_diff1[] = {1.0f, 1.0f, 1.0f,1.0f};
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff1);
@@ -260,54 +292,54 @@ void display(void)
 	{
 		glPushMatrix();
 		glTranslatef(x, 0, 1000 + characterSizebuffer);
-		DrawPiece("PAWN.POL");
+		glCallList(pawn);
 		glPopMatrix();
 	}
 
 	glPushMatrix();
 	glTranslatef(4000 + characterSizebuffer, 0, 0 + characterSizebuffer);
-	DrawPiece("QUEEN.POL");
+	glCallList(queen);
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(3000 + characterSizebuffer, 0, 0 + characterSizebuffer);
-	DrawPiece("KING.POL");
+	glCallList(king);
 	glPopMatrix();
 
 
 
 	glPushMatrix();
 	glTranslatef(7000 + characterSizebuffer, 0, 0 + characterSizebuffer);
-	DrawPiece("ROOK.POL");
+	glCallList(rook);
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(0000 + characterSizebuffer, 0, 0 + characterSizebuffer);
-	DrawPiece("ROOK.POL");
+	glCallList(rook);
 	glPopMatrix();
 
 
 
 	glPushMatrix();
 	glTranslatef(6000 + characterSizebuffer, 0, 0 + characterSizebuffer);
-	DrawPiece("KNIGHT.POL");
+	glCallList(knight);
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(1000 + characterSizebuffer, 0, 0 + characterSizebuffer);
-	DrawPiece("KNIGHT.POL");
+	glCallList(knight);
 	glPopMatrix();
 
 		
 
 	glPushMatrix();
 	glTranslatef(5000 + characterSizebuffer, 0, 0 + characterSizebuffer);
-	DrawPiece("BISHOP.POL");
+	glCallList(bishop);
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(2000 + characterSizebuffer, 0, 0 + characterSizebuffer);
-	DrawPiece("BISHOP.POL");
+	glCallList(bishop);
 	glPopMatrix();
 
 	//glPushMatrix();
@@ -356,30 +388,29 @@ void display(void)
 	{
 		glPushMatrix();
 		glTranslatef(x, 0, 6000 + characterSizebuffer );
-		DrawPiece("PAWN.POL");
+		glCallList(pawn);
 		glPopMatrix();
 	}
 
 	glPushMatrix();
 	glTranslatef(4000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
-	DrawPiece("QUEEN.POL");
+	glCallList(queen);
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(3000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
-	DrawPiece("KING.POL");
+	glCallList(king);
 	glPopMatrix();
-
 
 
 	glPushMatrix();
 	glTranslatef(7000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
-	DrawPiece("ROOK.POL");
+	glCallList(rook);
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(0000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
-	DrawPiece("ROOK.POL");
+	glCallList(rook);
 	glPopMatrix();
 
 
@@ -387,25 +418,25 @@ void display(void)
 	glPushMatrix();
 	glTranslatef(6000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
 	glRotated(180, 0, 1, 0);
-	DrawPiece("KNIGHT.POL");
+	glCallList(knight);
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(1000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
 	glRotated(180, 0, 1, 0);
-	DrawPiece("KNIGHT.POL");
+	glCallList(knight);
 	glPopMatrix();
 
 		
 
 	glPushMatrix();
 	glTranslatef(5000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
-	DrawPiece("BISHOP.POL");
+	glCallList(bishop);
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(2000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
-	DrawPiece("BISHOP.POL");
+	glCallList(bishop);
 	glPopMatrix();
 
 
