@@ -197,6 +197,11 @@ double atl[3]  = {4000, 0, 4000};
 //Back View
 double eye[3] = {4000, 9000, -5000};
 double at[3]  = {4000, 0, 4000};
+//TOP View
+double eyet[3] = {4000, 9000, 13000};
+double att[3]  = {4000, 0, 4000};
+
+
 
 
 //
@@ -232,6 +237,9 @@ void display(void)
 	}
 	else if (current_view == ::right) {
 		gluLookAt(eyer[0], eyer[1], eyer[2],  atr[0], atr[1], atr[2],  0,1,0); // Y is up!
+	}
+	else if (current_view == ::top) {
+		gluLookAt(eyet[0], eyet[1], eyet[2],  att[0], att[1], att[2],  0,1,0); // Y is up!
 	}
 	//gluLookAt(eye[0], eye[1], eye[2],  at[0], at[1], at[2],  0,1,0); // Y is up!
 
@@ -470,7 +478,10 @@ void display(void)
 				//DrawQuadOutline(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
 				////DrawQuadOutline(x, z, x + buffer, z);
 			}
-
+			//DRAW TOP LIP
+			if (z == 7000 && current_view == ::top) {
+				DrawZMaxLip(x, z);
+			}
 			//DRAW BOTTOM LIP	
 			if (z == 0 && current_view == ::bottom) {
 				DrawZZeroLip(x, z);
@@ -548,6 +559,10 @@ void keyboard(unsigned char c, int x, int y)
 			current_view = ::bottom;
 			break;
 		
+		case 't':
+			current_view = ::top;
+			break;
+
 		case 'l':
 			current_view = ::left;
 			break;
