@@ -83,6 +83,66 @@ void FindTriangleNormal(double x[], double y[], double z[], double n[])
 // Loads the given data file and draws it at its default position.
 // Call glTranslate before calling this to get it in the right place.
 
+void DrawPiece(const char filename[], double t)
+{
+	double delay = 1;
+	t -= delay;
+	if (t < 0) {
+		t = 0;
+	}	
+	// Try to open the given file.
+	char buffer[200];
+	ifstream in(filename);
+	if(!in)
+	{
+		cerr << "Error. Could not open " << filename << endl;
+		exit(1);
+	}
+
+	double x[100], y[100], z[100]; // stores a single polygon up to 100 vertices.
+	int done = false;
+	int verts = 0; // vertices in the current polygon
+	int polygons = 0; // total polygons in this file.
+	do
+	{
+		in.getline(buffer, 200); // get one line (point) from the file.
+		int count = sscanf_s(buffer, "%lf, %lf, %lf", &(x[verts]), &(y[verts]), &(z[verts]));
+		done = in.eof();
+		if(!done)
+		{
+			if(count == 3) // if this line had an x,y,z point.
+			{
+				verts++;
+			}
+			else // the line was empty. Finish current polygon and start a new one.
+			{
+				if(verts>=3)
+				{
+					glBegin(GL_POLYGON);
+					double n[3];
+					FindTriangleNormal(x, y, z, n);
+					glNormal3dv(n);
+					for(int i=0; i<verts; i++)
+					{
+						glVertex3d( x[i] + n[i] * 1000 * t, y[i], z[i] + n[i] * 1000 * t);
+					}
+					glEnd(); // end previous polygon
+					polygons++;
+					verts = 0;
+				}
+			}
+		}
+	}
+	while(!done);
+
+	if(verts>0)
+	{
+		cerr << "Error. Extra vertices in file " << filename << endl;
+		exit(1);
+	}
+
+}
+
 
 
 void DrawPiece(const char filename[])
@@ -186,7 +246,7 @@ void DrawLine(double x1, double y1, double x2, double y2)
 }
 
 
-enum View {bottom, top, left, right,};
+enum View {bottom, top, left, right, centerFly};
 View current_view = bottom;
 //side View Right
 double eyer[3] = {-6000, 9000, 4000};
@@ -200,8 +260,9 @@ double at[3]  = {4000, 0, 4000};
 //TOP View
 double eyet[3] = {4000, 9000, 13000};
 double att[3]  = {4000, 0, 4000};
-
-
+//FLY View
+double eyef[3] = {-6000, 9000, 2500};
+double atf[3]  = {4000, 0, 4000};
 
 
 //
@@ -220,6 +281,25 @@ void Interpolate(double t, double t0, double t1,
 	v = v0 + (v1 - v0)*ratio;
 }
 
+//void EvalCurve(float t, double & p0, double p1, double p2, double p3)
+//{
+//
+//	for (int i = 0; i < 3; i++)
+//	{
+//		p1 = p1 * (1 - t) * (1 - t) * (1 - t) + 3 * p1.p[i] * (1 - t) * (1 - t) * t + 3 * p2.p[i] * (1 - t) * t * t + p3.p[i] * t * t * t;
+//		p2 = p2 * (1 - t) * (1 - t) * (1 - t) + 3 * p1.p[i] * (1 - t) * (1 - t) * t + 3 * p2.p[i] * (1 - t) * t * t + p3.p[i] * t * t * t;
+//		p3 = p3 * (1 - t) * (1 - t) * (1 - t) + 3 * p1.p[i] * (1 - t) * (1 - t) * t + 3 * p2.p[i] * (1 - t) * t * t + p3.p[i] * t * t * t;
+//	}
+//}
+
+//interpolate following a 3rd point into the y axis
+void Interpolate(double t, double t0, double t1, double& v, double v0, double v1, double v2){
+	//need the y postiong of  p0, p1, p2 and we need the z position of p0, p1, p2
+	//the y and z postitions should be clalculated completely independently of eachother
+	//z = pow((1 - t), 3) * x + 3 * t * pow((1 - t), 2) * x + 3 * (1 - t) * pow(t, 2) * x + pow(t, 3) * x;
+	//y = pow((1 - t), 3) * y + 3 * t * pow((1 - t), 2) * y + 3 * (1 - t) * pow(t, 2) * y + pow(t, 3) * y;
+}
+
 // This callback function gets called by the Glut
 // system whenever it decides things need to be redrawn.
 void display(void)
@@ -230,23 +310,56 @@ void display(void)
 
 	glLoadIdentity();
 	if (current_view == bottom) {
-	gluLookAt(eye[0], eye[1], eye[2],  at[0], at[1], at[2],  0,1,0); // Y is up!
+	gluLookAt(eye[0], eye[1], eye[2],  at[0], at[1], at[2],  0,1,0);
 	}
 	else if (current_view == ::left){
-		gluLookAt(eyel[0], eyel[1], eyel[2],  atl[0], atl[1], atl[2],  0,1,0); // Y is up!
+		gluLookAt(eyel[0], eyel[1], eyel[2],  atl[0], atl[1], atl[2],  0,1,0);
 	}
 	else if (current_view == ::right) {
-		gluLookAt(eyer[0], eyer[1], eyer[2],  atr[0], atr[1], atr[2],  0,1,0); // Y is up!
+		gluLookAt(eyer[0], eyer[1], eyer[2],  atr[0], atr[1], atr[2],  0,1,0);
 	}
 	else if (current_view == ::top) {
-		gluLookAt(eyet[0], eyet[1], eyet[2],  att[0], att[1], att[2],  0,1,0); // Y is up!
+		gluLookAt(eyet[0], eyet[1], eyet[2], att[0], att[1], att[2], 0, 1, 0);
 	}
-	//gluLookAt(eye[0], eye[1], eye[2],  at[0], at[1], at[2],  0,1,0); // Y is up!
+	else if (current_view == ::centerFly) {
+	//double eyef[3] = {-6000, 9000, 2500};
+	//double atf[3]  = {4000, 0, 4000};
 
+	//double eyer[3] = {-6000, 9000, 4000};
+	//double atr[3]  = {4000, 0, 4000};
+	
+	//double eyel[3] = {14000, 9000, 4000};
+	//double atl[3]  = {4000, 0, 4000};
+		double eyeX;
+		double eyeY;
+		double eyeZ;
+		double atX;
+		double atY;
+		Interpolate(t, 2, 5, eyeX, -8000, 16000);
+		Interpolate(t, 2, 5, atX, 8000, 0);
+		Interpolate(t, 2, 3.5, eyeY, 9000, 3000);
+		if (t > 3.5) {
+			Interpolate(t, 3.5, 5, eyeY, 3000, 9000);
+		}
+	//RECENTER
+		if (t > 5) {
+			//recenterATX
+			Interpolate(t, 5, 6, atX, 0, 4000);
+			//recenterEYEX
+			Interpolate(t, 5, 6, eyeX, 16000, 14000);
+		}
+		Interpolate(t, 5, 6, eyeZ, 2500, 4000);
+	
+		//Interpolate(t, 2, 5, eyeY,  )
+		gluLookAt(eyeX, eyeY, eyeZ, atX, atf[1], atf[2], 0, 1, 0);
+
+	}
+
+	//gluLookAt(eye[0], eye[1], eye[2],  at[0], at[1], at[2],  0,1,0); // Y is up!
 
 	/************************************************************************************************************************************
 
-				WHITE'S BOARDS SPACE
+				WRITE MODELS TO GPU
 
 	*************************************************************************************************************************************/
 
@@ -279,7 +392,11 @@ void display(void)
 	glEndList();
 
 
+	/************************************************************************************************************************************
 
+				WHITE'S BOARDS SPACE
+
+	*************************************************************************************************************************************/
 
 
 	// Set the color for one side (white), and draw its 16 pieces.
@@ -287,14 +404,61 @@ void display(void)
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff1);
 
 	int characterSizebuffer = 500;
+	double z;
+	double x;
+	double y;
+	double angle;
+	double scaleSize;
 
 	for(int x = 0 + characterSizebuffer; x < 8000 + characterSizebuffer; x += 1000)
 	{
+		Interpolate(t, 1, 3, z,  1000 + (.5 * characterSizebuffer), 3000 + .5 * characterSizebuffer);
+		Interpolate(t, 2, 3 , y, 0, 2000 );
+		Interpolate(t, 2, 3 , y, 0, 2000 );
 		glPushMatrix();
-		glTranslatef(x, 0, 1000 + characterSizebuffer);
+		glTranslatef(x, y, z + characterSizebuffer);
+	
+		if ((x - characterSizebuffer) % 2000 == 0) {
+			Interpolate(t, 3, 3.5, angle, 0, -45);
+			glRotated(angle, 1, 0, 0);
+			glTranslated(0, 0, 0);
+		}
+		else {
+			Interpolate(t, 3, 3.5, angle, 0, 45);
+			glRotated(angle, 1, 0, 0);
+			glTranslated(0, 0, 0);
+		}
+
+		if ((x - characterSizebuffer) % 2000 == 0) {
+			Interpolate(t, 3.5, 4.5, angle, 0, 90);
+			glRotated(angle, 1, 0, 0);
+			glTranslated(0, 0, 0);
+		}
+		else {
+			Interpolate(t, 3.5, 4.5, angle, 0, -90);
+			glRotated(angle, 1, 0, 0);
+			glTranslated(0, 0, 0);
+		}
+
+	// Rotates to hit other pieces
+		//if ((x - characterSizebuffer) % 2000 == 0) {
+		//	Interpolate(t, 4.5, 5.5, angle, 0, -270);
+		//	glRotated(angle, 1, 0, 0);
+		//	glTranslated(0, 0, 0);
+		//}
+
+		
 		glCallList(pawn);
 		glPopMatrix();
 	}
+	
+	//if (t > 3.5 && t < 4.5) {
+	//
+	//	glPushMatrix();
+	//	glTranslatef(x, 0, z + characterSizebuffer);
+	//	glCallList(pawn);
+	//	glPopMatrix();
+	//}
 
 	glPushMatrix();
 	glTranslatef(4000 + characterSizebuffer, 0, 0 + characterSizebuffer);
@@ -309,12 +473,15 @@ void display(void)
 
 
 	glPushMatrix();
-	glTranslatef(7000 + characterSizebuffer, 0, 0 + characterSizebuffer);
+	// Take other rook
+	Interpolate(t, 5, 7, z, 0, 7000);
+	glTranslatef(7000 + characterSizebuffer, 0, z + characterSizebuffer);
 	glCallList(rook);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(0000 + characterSizebuffer, 0, 0 + characterSizebuffer);
+	Interpolate(t, 6.87, 8, z, 0, -10000);
+	glTranslatef(0000 + characterSizebuffer, 0, z + characterSizebuffer);
 	glCallList(rook);
 	glPopMatrix();
 
@@ -384,10 +551,45 @@ void display(void)
 	//glPopMatrix();
 
 	//shift for size of piece as to not sure where they are measured from
-	for(int x= 0 + characterSizebuffer; x<8000 + characterSizebuffer; x+=1000)
+	for(int x = 0 + characterSizebuffer; x<8000 + characterSizebuffer; x+=1000)
 	{
+		Interpolate(t, 1, 3, z, 6000, 4000 - (.5 * characterSizebuffer));
+		Interpolate(t, 2, 3 , y, 0, 2000 );
 		glPushMatrix();
-		glTranslatef(x, 0, 6000 + characterSizebuffer );
+		glTranslatef(x, y, z + characterSizebuffer );
+
+		if ((x - characterSizebuffer) % 2000 == 0){
+			Interpolate(t, 3, 3.5, angle, 0, -45);
+			glRotated(angle, 1, 0, 0);
+			glTranslated(0, 0, 0);
+		}
+		else {
+			Interpolate(t, 3, 3.5, angle, 0, 45);
+			glRotated(angle, 1, 0, 0);
+			glTranslated(0, 0, 0);
+		}
+	
+		if ((x - characterSizebuffer) % 2000 == 0) {
+			Interpolate(t, 3.5, 4.5, angle, 0, 90);
+			glRotated(angle, 1, 0, 0);
+			glTranslated(0, 0, 0);
+		}
+		else {
+			Interpolate(t, 3.5, 4.5, angle, 0, -90);
+			glRotated(angle, 1, 0, 0);
+			glTranslated(0, 0, 0);
+		}
+
+	//HIT ON BOTTOM AT t = 5.5
+		//if ((x - characterSizebuffer) % 2000 == 0) {
+		//	if (t > 5.5) {
+		//		Interpolate(t, 5.5, 6.5, z, 4000 - (.5 * characterSizebuffer), 15000);
+		//		glTranslated(0, y, z - 6000);
+
+		//	}
+		//}
+
+			
 		glCallList(pawn);
 		glPopMatrix();
 	}
@@ -404,12 +606,16 @@ void display(void)
 
 
 	glPushMatrix();
-	glTranslatef(7000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
+	//react to rook take
+	Interpolate(t, 6.87, 10, z, 7000, 20000);
+	glTranslatef(7000 + characterSizebuffer, 0, z + characterSizebuffer);
 	glCallList(rook);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(0000 + characterSizebuffer, 0, 7000 + characterSizebuffer);
+	//Take Rook
+	Interpolate(t, 5, 7, z, 7000, 0);
+	glTranslatef(0000 + characterSizebuffer, 0, z + characterSizebuffer);
 	glCallList(rook);
 	glPopMatrix();
 
@@ -454,117 +660,26 @@ void display(void)
 		for (int z = 0; z < 8000; z += buffer) {
 			
 			//DRAW CLOSE SIDE LIP x = 0
-			if (x == 0 && current_view == ::right) {
+			if (x == 0) {
 				DrawXZeroLip(x, z);
-				////DRAW RED LIP
-				//if (x % 2000 == 0 && z % 2000 != 0) {
-				//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				//	DrawQuad(x, 0, z, x, 0, z + buffer, x, (-1 * buffer), z + buffer, x, (-1 * buffer), z);
-				//	}
-				//else if (x % 2000 != 0 && z % 2000 == 0) {
-				//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				//	DrawQuad(x, 0, z, x, 0, z + buffer, x, (-1 * buffer), z + buffer, x, (-1 * buffer), z);
-				//}
-				////DRAW GRAY LIP
-				//else {
-				//	GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
-				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				//	DrawQuad(x, 0, z, x, 0, z + buffer, x, (-1 * buffer), z + buffer, x, (-1 * buffer), z);
-			
-				//}
-			
-				//GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
-				//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				//DrawQuadOutline(x, 0, z, x, 0, z + buffer, x, (-1 * buffer), z + buffer, x, (-1 * buffer), z);
-				////DrawQuadOutline(x, z, x + buffer, z);
-
 			}
 		
 			// DRAW FAR SIDE LIP X = 8000
-			if (x == 7000 && current_view == ::left) {
+			if (x == 7000) {
 				DrawXMaxLip(x, z);
-				////DRAW RED LIP
-				//if (x % 2000 == 0 && z % 2000 != 0) {
-				//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				//	DrawQuad(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
-				//	}
-				//else if (x % 2000 != 0 && z % 2000 == 0) {
-				//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				//	DrawQuad(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
-				//}
-				////DRAW GRAY LIP
-				//else {
-				//	GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
-				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				//	DrawQuad(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
-			
-				//}
-			
-				//GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
-				//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				//DrawQuadOutline(x + buffer, 0, z, x + buffer, 0, z + buffer, x + buffer, (-1 * buffer), z + buffer, x + buffer, (-1 * buffer), z);
-				////DrawQuadOutline(x, z, x + buffer, z);
 			}
+
 			//DRAW TOP LIP
-			if (z == 7000 && current_view == ::top) {
+			if (z == 7000 ) {
 				DrawZMaxLip(x, z);
 			}
+			
 			//DRAW BOTTOM LIP	
-			if (z == 0 && current_view == ::bottom) {
+			if (z == 0) {
 				DrawZZeroLip(x, z);
-				////DRAW RED LIP
-				//if (x % 2000 == 0 && z % 2000 != 0) {
-				//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				//	DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
-				//	}
-				//else if (x % 2000 != 0 && z % 2000 == 0) {
-				//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				//	DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
-				//}
-				////DRAW GRAY LIP
-				//else {
-				//	GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
-				//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				//	DrawQuad(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
-			
-				//}
-			
-				//GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
-				//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-				//DrawQuadOutline(x + buffer, 0, z, x + buffer, (-1 * buffer), z, x + buffer + (-1 * buffer), (-1 * buffer), z, x +  buffer + (- 1 * buffer), 0, z);
-				////DrawQuadOutline(x, z, x + buffer, z);
 			}
 			
 			DrawMainBoard(x, z);
-			//// DRAW RED SQUARES
-			//if (x % 2000 == 0 && z % 2000 != 0) {
-			//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-			//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-			//	DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
-			//	}
-			//else if (x % 2000 != 0 && z % 2000 == 0) {
-			//	GLfloat mat_amb_diff2[] = {1.0f, 0.0f, 0.0f, 1.0};
-			//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-			//	DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
-			//}
-			//// DRAW GRAY SQUARES
-			//else {
-			//	GLfloat mat_amb_diff2[] = {1.0f, 1.0f, 1.0f, 1.0};
-			//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-			//	DrawQuad(x, 0, z, x, 0, z + buffer, x + buffer, 0, z + buffer, x + buffer, 0, z);
-		
-			//}
-			//
-			//GLfloat mat_amb_diff2[] = {0.0f, 0.0f, 0.0f, 1.0};
-			//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff2);
-			//
-			//DrawQuadOutline(x, 0.1, z, x, 0.1, z + buffer, x + buffer, 0.1, z + buffer, x + buffer, 0.1, z);
 		}
 	}
 
@@ -596,6 +711,10 @@ void keyboard(unsigned char c, int x, int y)
 
 		case 'l':
 			current_view = ::left;
+			break;
+
+		case 'f':
+			current_view = ::centerFly;
 			break;
 
 		case 'r':
